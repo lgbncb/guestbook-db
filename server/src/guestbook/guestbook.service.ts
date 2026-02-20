@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGuestbookDto } from './dto/create-guestbook.dto';
-import { UpdateGuestbookDto } from './dto/update-guestbook.dto';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class GuestbookService {
-  create(createGuestbookDto: CreateGuestbookDto) {
-    return 'This action adds a new guestbook';
+  private supabase: SupabaseClient;
+
+constructor() {
+    this.supabase = createClient(
+      process.env.SUPABASE_URL as string, 
+      process.env.SUPABASE_KEY as string
+    );
   }
 
-  findAll() {
-    return `This action returns all guestbook`;
+  async findAll() {
+    const { data } = await this.supabase.from('guestbook').select('*').order('created_at', { ascending: false });
+    return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} guestbook`;
+  async create(entry: { name: string; message: string }) {
+    const { data } = await this.supabase.from('guestbook').insert([entry]).select();
+    return data;
   }
 
-  update(id: number, updateGuestbookDto: UpdateGuestbookDto) {
-    return `This action updates a #${id} guestbook`;
+  async update(id: string, entry: { message: string }) {
+    const { data } = await this.supabase.from('guestbook').update({ message: entry.message }).eq('id', id).select();
+    return data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} guestbook`;
+  async remove(id: string) {
+    await this.supabase.from('guestbook').delete().eq('id', id);
+    return { message: 'Deleted' };
   }
 }
