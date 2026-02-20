@@ -12,15 +12,23 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editMessage, setEditMessage] = useState('');
 
-  const fetchEntries = async () => {
+const fetchEntries = async () => {
     try {
       const res = await axios.get(`${API_URL}/guestbook`);
-      setEntries(res.data);
+      
+      console.log("🔍 Backend sent this:", res.data); 
+      
+      // Safety check: Only set entries if it's a real array
+      if (Array.isArray(res.data)) {
+        setEntries(res.data);
+      } else {
+        console.error("🚨 Expected an array, but got:", res.data);
+        setEntries([]); // Fallback to an empty array so the page doesn't crash
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
   useEffect(() => { fetchEntries(); }, []);
 
   const handleSubmit = async (e) => {
