@@ -7,7 +7,6 @@ export class GuestbookController {
 
   @Get()
   async findAll() {
-    // The 'return' keyword is critical here so the frontend gets the array!
     return await this.guestbookService.findAll();
   }
 
