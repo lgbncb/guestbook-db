@@ -6,14 +6,23 @@ export class GuestbookController {
   constructor(private readonly guestbookService: GuestbookService) {}
 
   @Get()
-  findAll() { return this.guestbookService.findAll(); }
+  async findAll() {
+    // The 'return' keyword is critical here so the frontend gets the array!
+    return await this.guestbookService.findAll();
+  }
 
   @Post()
-  create(@Body() body: { name: string; message: string }) { return this.guestbookService.create(body); }
+  async create(@Body() entry: { name: string; message: string }) {
+    return await this.guestbookService.create(entry);
+  }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: { message: string }) { return this.guestbookService.update(id, body); }
+  async update(@Param('id') id: string, @Body() entry: { message: string }) {
+    return await this.guestbookService.update(id, entry);
+  }
 
   @Delete(':id')
-  remove(@Param('id') id: string) { return this.guestbookService.remove(id); }
+  async remove(@Param('id') id: string) {
+    return await this.guestbookService.remove(id);
+  }
 }
