@@ -14,22 +14,22 @@ function App() {
 
 const fetchEntries = async () => {
     try {
-      const res = await axios.get(`${API_URL}/guestbook`);
+      const targetUrl = `${API_URL}/guestbook`;
+      const res = await axios.get(targetUrl);
       
-      console.log("🔍 Backend sent this:", res.data); 
-      
-      // Safety check: Only set entries if it's a real array
       if (Array.isArray(res.data)) {
         setEntries(res.data);
       } else {
-        console.error("🚨 Expected an array, but got:", res.data);
-        setEntries([]); // Fallback to an empty array so the page doesn't crash
+        // This will pop up a massive alert on your screen with the exact culprit!
+        const dataPreview = typeof res.data === 'string' ? res.data.substring(0, 150) : JSON.stringify(res.data).substring(0, 150);
+        alert(`🚨 DATA PIPELINE ERROR 🚨\n\n1. Target URL: ${targetUrl}\n2. Received Type: ${typeof res.data}\n\n3. The backend actually sent this:\n${dataPreview}...`);
+        setEntries([]);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      alert(`🚨 NETWORK ERROR: ${error.message}`);
     }
   };
-  useEffect(() => { fetchEntries(); }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
