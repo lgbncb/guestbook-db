@@ -12,13 +12,18 @@ export class GuestbookService {
     );
   }
 
-  async findAll() {
-    const { data, error } = await this.supabase.from('guestbook').select('*').order('created_at', { ascending: false });
-    // Force the server to scream if Supabase fails
-    if (error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    // Guarantee an array is returned, even if empty
-    return data || [];
+async findAll() {
+  const { data, error } = await this.supabase
+    .from('guestbook')
+    .select('*')
+    .order('created_at', { ascending: false }); // Latest messages first
+
+  if (error) {
+    console.error("Supabase Read Error:", error);
+    throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+  return data || []; 
+}
 
   async create(entry: { name: string; message: string }) {
     const { data, error } = await this.supabase.from('guestbook').insert([entry]).select();
